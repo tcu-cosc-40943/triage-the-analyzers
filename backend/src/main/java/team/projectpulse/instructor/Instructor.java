@@ -30,6 +30,7 @@ public class Instructor extends PeerEvaluationUser {
 
 
     public Instructor() {
+        // Required by JPA: Hibernate creates the entity through this no-argument constructor when loading rows.
     }
 
     public Instructor(String username, String firstName, String lastName, String email, String password, boolean enabled, String roles) {

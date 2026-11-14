@@ -56,6 +56,7 @@ public class UseCaseExtension {
 
 
     public UseCaseExtension() {
+        // Required by JPA: Hibernate creates the entity through this no-argument constructor when loading rows.
 
     }
 

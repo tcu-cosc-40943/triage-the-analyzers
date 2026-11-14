@@ -36,6 +36,7 @@ public class PeerEvaluation {
 
 
     public PeerEvaluation() {
+        // Required by JPA: Hibernate creates the entity through this no-argument constructor when loading rows.
     }
 
     public PeerEvaluation(String week, Student evaluator, Student evaluatee, List<Rating> ratings, String publicComment, String privateComment) {

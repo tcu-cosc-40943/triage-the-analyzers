@@ -37,6 +37,7 @@ public class Activity {
 
 
     public Activity() {
+        // Required by JPA: Hibernate creates the entity through this no-argument constructor when loading rows.
     }
 
     public Activity(Student student, String week, Team team, ActivityCategory category, String activity, String description, Double plannedHours, Double actualHours, ActivityStatus status) {

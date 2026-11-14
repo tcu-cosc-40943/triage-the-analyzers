@@ -28,6 +28,7 @@ public class ArtifactKeySequence {
 
 
     public ArtifactKeySequence() {
+        // Required by JPA: Hibernate creates the entity through this no-argument constructor when loading rows.
     }
 
     public ArtifactKeySequence(Team team, RequirementArtifactType type) {

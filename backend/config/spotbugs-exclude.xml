@@ -7,4 +7,73 @@
 
      Unlike the baseline, this file may grow, but every entry is a reviewed decision. -->
 <FindBugsFilter>
+
+    <!-- D1 (narrow) EI_EXPOSE_REP / EI_EXPOSE_REP2 are not enforced for the four kinds of class below, and stay
+         enforced everywhere else. Each group says why sharing the reference is the intended design there. -->
+
+    <!-- D1a JPA entities. Associations and collections must be the live, Hibernate-managed objects: Hibernate
+         tracks changes through them, and the aggregate helpers (e.g. Section.addInstructor calls
+         instructor.getSections().add(this)) depend on mutating them in place. A defensive copy would silently
+         stop those changes from being saved. A new @Entity is added to this list when it is created. -->
+    <Match>
+        <Or>
+            <Class name="team.projectpulse.activity.Activity"/>
+            <Class name="team.projectpulse.course.Course"/>
+            <Class name="team.projectpulse.evaluation.PeerEvaluation"/>
+            <Class name="team.projectpulse.evaluation.Rating"/>
+            <Class name="team.projectpulse.instructor.Instructor"/>
+            <Class name="team.projectpulse.ram.collaboration.Comment"/>
+            <Class name="team.projectpulse.ram.collaboration.CommentThread"/>
+            <Class name="team.projectpulse.ram.document.DocumentSection"/>
+            <Class name="team.projectpulse.ram.document.DocumentSectionLock"/>
+            <Class name="team.projectpulse.ram.document.RequirementDocument"/>
+            <Class name="team.projectpulse.ram.requirement.ArtifactKeySequence"/>
+            <Class name="team.projectpulse.ram.requirement.ArtifactLink"/>
+            <Class name="team.projectpulse.ram.requirement.RequirementArtifact"/>
+            <Class name="team.projectpulse.ram.usecase.UseCase"/>
+            <Class name="team.projectpulse.ram.usecase.UseCaseExtension"/>
+            <Class name="team.projectpulse.ram.usecase.UseCaseExtensionStep"/>
+            <Class name="team.projectpulse.ram.usecase.UseCaseLock"/>
+            <Class name="team.projectpulse.ram.usecase.UseCaseMainStep"/>
+            <Class name="team.projectpulse.rubric.Criterion"/>
+            <Class name="team.projectpulse.rubric.Rubric"/>
+            <Class name="team.projectpulse.section.Section"/>
+            <Class name="team.projectpulse.student.Student"/>
+            <Class name="team.projectpulse.team.Team"/>
+        </Or>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+
+    <!-- D1b Constructor injection of Spring beans. Every one of these findings is a constructor storing an
+         injected *Service or *Repository singleton; sharing that singleton is what dependency injection is for,
+         and the backend convention requires constructor injection. Only constructors storing those fields are
+         excluded, so a bean's getters and setters are still checked. -->
+    <Match>
+        <Method name="&lt;init&gt;"/>
+        <Field name="~.*(Service|Repository)"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+
+    <!-- D1c Transport records and report shapes. These are built per request (by converters, or by
+         EvaluationService for reports), serialized by Jackson, and dropped; no instance outlives the request or is
+         cached, so nothing shares the exposed list. EvaluationService.generateWeeklyPeerEvaluationReportForSection fills a
+         report through report.getPeerEvaluationAverages().add(...), which a defensive copy would break. -->
+    <Match>
+        <Or>
+            <Package name="~team\.projectpulse\..*\.dto"/>
+            <Class name="team.projectpulse.evaluation.PeerEvaluationAverage"/>
+            <Class name="team.projectpulse.evaluation.WeeklyPeerEvaluationReport"/>
+            <Class name="team.projectpulse.notification.ReminderService$ReminderResult"/>
+        </Or>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+
+    <!-- D1d The Spring Security principal. UserService wraps the loaded user entity in a MyUserPrincipal, and
+         AuthService and JwtProvider read it back through getPeerEvaluationUser(); exposing that entity is the
+         class's whole job. -->
+    <Match>
+        <Class name="team.projectpulse.user.MyUserPrincipal"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+
 </FindBugsFilter>

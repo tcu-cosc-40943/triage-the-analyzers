@@ -13,5 +13,13 @@
          xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
     <description>PMD quickstart, with Project Pulse's decisions.</description>
     <rule ref="rulesets/java/quickstart.xml">
+        <!-- D4 GuardLogStatement: off. Every logger in the backend is SLF4J, and every log call passes its values
+             as {} placeholders; none concatenates or formats a string, so a disabled level costs no message
+             building. The remaining eager work is a trivial getter (getEmail(), getSectionName(), size(),
+             getName()). Three of the four findings log at info or error, which are on under Spring Boot's default
+             INFO root level (no profile overrides it), so a guard would always be true. The fourth,
+             AuthController's debug line, runs once per login. If a log call ever builds its message eagerly
+             (string concatenation, String.format, or an expensive call), guard that call or pass a Supplier. -->
+        <exclude name="GuardLogStatement"/>
     </rule>
 </ruleset>
