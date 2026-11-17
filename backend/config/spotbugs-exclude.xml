@@ -7,4 +7,19 @@
 
      Unlike the baseline, this file may grow, but every entry is a reviewed decision. -->
 <FindBugsFilter>
+    <!-- D1: EI_EXPOSE_REP / EI_EXPOSE_REP2 are off project-wide. Every finding (219 on 2026-11-01) is one of
+         three kinds, and none is a defect here:
+         - JPA entities (144) returning or storing their associations. Hibernate tracks the managed
+           instance and its collections (lazy proxies, dirty checking, orphanRemoval); a defensive copy
+           would detach the caller's changes from the persistence context, so sharing is required.
+         - Spring beans (25) storing constructor-injected collaborators. Those are container singletons;
+           sharing them is the point of dependency injection.
+         - DTOs and response records (48), built per request and serialized at once; nothing holds
+           a reference long enough for outside mutation to matter. -->
+    <Match>
+        <Or>
+            <Bug pattern="EI_EXPOSE_REP"/>
+            <Bug pattern="EI_EXPOSE_REP2"/>
+        </Or>
+    </Match>
 </FindBugsFilter>

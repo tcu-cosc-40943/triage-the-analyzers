@@ -13,5 +13,15 @@
          xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
     <description>PMD quickstart, with Project Pulse's decisions.</description>
     <rule ref="rulesets/java/quickstart.xml">
+        <!-- D2: every empty constructor in Project Pulse is the no-arg constructor that JPA (on @Entity
+             classes) or Jackson (on DTOs such as Result) requires. Declaring it explicitly keeps that
+             contract visible, and keeps it from silently disappearing when someone adds a second
+             constructor, so it is neither unnecessary nor in need of a comment on each one. -->
+        <exclude name="UncommentedEmptyConstructor"/>
+        <exclude name="UnnecessaryConstructor"/>
+        <!-- D4: all logging goes through SLF4J with {} placeholders, which defers message formatting
+             until the level is known to be enabled. The arguments PMD flags are getters and size()
+             calls, so an isXEnabled() guard would add a branch to save nothing. -->
+        <exclude name="GuardLogStatement"/>
     </rule>
 </ruleset>
